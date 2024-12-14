@@ -1,3 +1,22 @@
+const { execSync } = require('child_process'); // Import child_process to run shell commands
+
+// Function to install missing libraries
+const installDependencies = () => {
+    const dependencies = ['discord.js', 'axios']; // List of required libraries
+    dependencies.forEach(dep => {
+        try {
+            require.resolve(dep); // Check if the library is already installed
+        } catch (err) {
+            console.log(`Installing missing dependency: ${dep}...`);
+            execSync(`npm install ${dep}`, { stdio: 'inherit' }); // Install the library
+            console.log(`${dep} has been installed successfully.`);
+        }
+    });
+};
+
+installDependencies(); // Install dependencies before running the rest of the script
+
+// Bot logic starts here
 const { Client: c, GatewayIntentBits: g, EmbedBuilder: e } = require('discord.js');
 const axios = require('axios');
 const { token: t } = require('./config.json');
