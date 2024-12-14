@@ -1,8 +1,9 @@
 const { execSync } = require('child_process'); // Import child_process to run shell commands
+require('dotenv').config(); // Load environment variables from a .env file
 
 // Function to install missing libraries
 const installDependencies = () => {
-    const dependencies = ['discord.js', 'axios']; // List of required libraries
+    const dependencies = ['discord.js', 'axios', 'dotenv']; // List of required libraries
     dependencies.forEach(dep => {
         try {
             require.resolve(dep); // Check if the library is already installed
@@ -16,10 +17,15 @@ const installDependencies = () => {
 
 installDependencies(); // Install dependencies before running the rest of the script
 
-// Bot logic starts here
+// Bot token from environment variables
+const token = process.env.token;
+if (!token) {
+    console.error('Error: Bot token is missing! Please set the "token" environment variable.');
+    process.exit(1); // Exit the script if the token is not provided
+}
+
 const { Client: c, GatewayIntentBits: g, EmbedBuilder: e } = require('discord.js');
 const axios = require('axios');
-const { token: t } = require('./config.json');
 
 const u = new c({ intents: [g.Guilds, g.GuildMessages, g.MessageContent, g.GuildMembers] });
 
@@ -32,7 +38,7 @@ u.once('ready', () => {
             const response = await axios.patch(
                 'https://discord.com/api/v10/users/@me',
                 { bio: 'Funky 😛' }, // Update this string to change the bot's About Me
-                { headers: { Authorization: `Bot ${t}` } }
+                { headers: { Authorization: `Bot ${token}` } }
             );
 
             if (response.status === 200) {
@@ -91,4 +97,4 @@ u.on('messageCreate', m => {
     }
 });
 
-u.login(t).catch(e => console.error('Error logging in:', e));
+u.login(token).catch(e => console.error('Error logging in:', e));
